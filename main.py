@@ -7,49 +7,56 @@ import random
 from typing import List
 from typing import Tuple
 import time
-
+import datetime
 import pygame
-from hexagon import FlatTopHexagonTile
+from hexagon import Task
 from hexagon import HexagonTile
-import os
+
+from dataclasses import dataclass
 
 
 # pylint: disable=no-member
 
 
-def create_hexagon(target_cell, position, radius=50, flat_top=False) -> HexagonTile:
-    """Creates a hexagon tile at the specified position"""
-    class_ = FlatTopHexagonTile if flat_top else HexagonTile
-        # TODO: change colour in the below line in order to change the cell's color    # gold color rgb : (255,215,0)
-    return class_(target_cell, position, radius) 
+
+def render_task(screen, hexagons):
+    """Renders hexagons on the screen"""
+    screen.fill((255, 255, 255))           # screen color of white
+    for hexagon in hexagons:
+        hexagon.render(screen)
+        hexagon.render_highlight(screen, border_colour=(0, 0, 0))
+    pygame.display.flip()
+    
+def render_answer(screen, hexagons):
+    """Renders asnwer on the screen"""
+    screen.fill((255, 255, 255))           # screen color of white
+    for hexagon in hexagons:
+        hexagon.render_answer(screen)
+        hexagon.render_highlight(screen, border_colour=(0, 0, 0))   
+    pygame.display.flip()
 
 
-
-# def get_random_colour(min_=150, max_=255) -> Tuple[int, ...]:
-#     """Returns a random RGB colour with each component between min_ and max_"""
-#     return tuple(random.choices(list(range(min_, max_)), k=3))
-
-def init_hexagons(indices_to_1, num_x=6, num_y=4, flat_top=False) -> List[HexagonTile]:
+def init_hexagons(indices_to_1, num_x=6, num_y=4) -> List[HexagonTile]:
     """Creates a hexaogonal tile map of size num_x * num_y"""
-    # pylint: disable=invalid-name
 
     # determine if first cell is yellow or white
     temp = True if 0 in indices_to_1 else False
-    leftmost_hexagon = create_hexagon(target_cell=temp, position=(200, 200), flat_top=flat_top)
+    leftmost_hexagon = HexagonTile(is_target_cell=temp, position=(200, 200))  # TODO: change the position
     hexagons = [leftmost_hexagon]
     hex_counter = 0
-    gap = 0
+    gap = 0    
+    
+    # iterate over rows
     for x in range(num_y):  # x is the row number
         if x:
             # alternate between bottom left and bottom right vertices of hexagon above
-            index = 2 if x % 2 == 1 or flat_top else 4
+            index = 2 if x % 2 == 1 else 4
             position = leftmost_hexagon.vertices[index]
             position = (position[0], position[1]+gap)
 
-            if hex_counter in indices_to_1:
-                leftmost_hexagon = create_hexagon(True, position, flat_top=flat_top)
-            else:
-                leftmost_hexagon = create_hexagon(False, position, flat_top=flat_top)
+            # determine if current cell is target or not (yellow or white)
+            is_target_cell = True if hex_counter in indices_to_1 else False
+            leftmost_hexagon = HexagonTile(is_target_cell=is_target_cell, position=position)
             hexagons.append(leftmost_hexagon)
             hex_counter +=1
         else:
@@ -58,55 +65,44 @@ def init_hexagons(indices_to_1, num_x=6, num_y=4, flat_top=False) -> List[Hexago
         # place hexagons to the left of leftmost hexagon, with equal y-values.
         hexagon = leftmost_hexagon
         
+        # iterate over columns
         for i in range(1, num_x):   # i is the column number
             x, y = hexagon.position  # type: ignore    
             position = (x + hexagon.minimal_radius * 2, y)
             position = (position[0]+2*gap, position[1])
             
-            if hex_counter in indices_to_1:
-                hexagon = create_hexagon(True, position, flat_top=flat_top)
-            else:
-                hexagon = create_hexagon(False, position, flat_top=flat_top)
+            # determine if current cell is target or not (yellow or white)
+            is_target_cell = True if hex_counter in indices_to_1 else False
+            hexagon = HexagonTile(is_target_cell=is_target_cell, position=position)
             hexagons.append(hexagon)
             hex_counter +=1
             
     return hexagons
 
 
-def render(screen, hexagons):
-    """Renders hexagons on the screen"""
-    screen.fill((255, 255, 255))
-    for hexagon in hexagons:
-        hexagon.render(screen)
-        hexagon.render_highlight(screen, border_colour=(150, 0, 0))
-
-
-    # draw borders around colliding hexagons and neighbours
-    # if pygame.mouse.get_pressed():
-
-    #     mouse_pos = pygame.mouse.get_pos()
-        # print(mouse_pos)
-    # colliding_hexagons = [
-    #     hexagon for hexagon in hexagons if hexagon.collide_with_point(mouse_pos)
-    # ]
-    # for hexagon in colliding_hexagons:
-    #     for neighbour in hexagon.compute_neighbours(hexagons):
-    #         neighbour.render_highlight(screen, border_colour=(100, 100, 100))
-        # hexagon.render_highlight(screen, border_colour=(100, 100, 100))
-    pygame.display.flip()
-
 
 def main():
     """Main function"""
+    # show the task to the player for show_time seconds
     pygame.init()
+    indices_to_1 = [1, 2, 3, 23]
+    hexagons = init_hexagons(indices_to_1)
     screen = pygame.display.set_mode((750, 750))
     # screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-    clock = pygame.time.Clock()
-    indices_to_1 = [1, 5, 6, 7, 8, 11, 23]
-    hexagons = init_hexagons(indices_to_1, flat_top=False)
-    # print(hexagons)
-    terminated = False
+    show_time = 2
+    endTime = datetime.datetime.now() + datetime.timedelta(seconds=show_time)
+    while True:
+        render_task(screen, hexagons)
+        if datetime.datetime.now() >= endTime:
+            break
+    pygame.display.quit()
 
+
+    # show the white screen to the user in order to get his/her answer
+    pygame.init()
+    screen = pygame.display.set_mode((750, 750))
+    clock = pygame.time.Clock()
+    terminated = False      # if answer is terminated or not
     clicked_hexagon_id = set()
     while not terminated:
         for event in pygame.event.get():
@@ -121,24 +117,27 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP:
                 # get position of the mouse clicke (x, y)
                 pos = pygame.mouse.get_pos()
-                # find the hexagn which the user clicked on
-                clicked_sprites = [hexagon for hexagon in hexagons if hexagon.collide_with_point(pos)]
+                # find the hexagon which the user clicked on
+                for hexagon in hexagons:
+                    if hexagon.collide_with_point(pos):
+                        clicked_sprites = [hexagon]
+                        break
                 if clicked_sprites:
                     clicked_hexagon_id.add(id(clicked_sprites[0]))
-                    # print(clicked_hexagon_id)
-                    print(id(clicked_sprites[0]))
                     if len(clicked_hexagon_id) == len(indices_to_1):
-                        time.sleep(1)
                         terminated = True
                         
                 
                 # do something with the clicked sprites...
 
 
-        render(screen, hexagons)
+        render_answer(screen, hexagons)
         clock.tick(50)
-    pygame.display.quit()
 
+
+    time.sleep(1)
+    pygame.display.quit()
+    
 
 if __name__ == "__main__":
     main()
