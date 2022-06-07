@@ -18,14 +18,14 @@ import pygame
 @dataclass
 class HexagonTile:
     """Each Hexagon is one object from HexagonTile"""
-
     is_target_cell : Boolean
     position: Tuple[float, float]
+    index: int 
     radius: float = 50
     is_clicked_as_answer: Boolean = False
     is_answered_true: Boolean = None
     answer_colour: Tuple[int, int, int] = (255, 255, 255)       # answer color of white
-
+    
     def __post_init__(self):
         self.colour = (255, 255, 255) if self.is_target_cell == False else (255,215,0)
         self.vertices = self.compute_vertices()
@@ -52,11 +52,9 @@ class HexagonTile:
         if math.dist(point, self.centre) < self.minimal_radius :
             self.is_clicked_as_answer = True
             if self.is_target_cell == True:       # if this cell is s target cell
-                self.answer_seq.append('T')
                 self.is_answered_true = True
                 self.answer_colour = (0, 255, 0)     # green colour
             else: 
-                self.answer_seq.append('F')
                 self.is_answered_true = False
                 self.answer_colour = (255, 0, 0)     # red colour
             return True

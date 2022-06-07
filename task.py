@@ -2,23 +2,25 @@ from __future__ import annotations
 from typing import List
 from typing import Tuple
 from hexagon import HexagonTile
+import datetime
+
 
 class Task:
-    def __init__(self, indices_to_1: Tuple[int, ...], num_x=6, num_y=4):
+    def __init__(self, indices_to_1, num_x=6, num_y=4, show_time=2):
 
         self.indices_to_1 = indices_to_1
         self.num_x = num_x
         self.num_y = num_y
-        # call instance method
-        self.hexagons = self.creat_task()
-
-        # based on user answer
-        # self.datetime = datetime.datetime.now().__str__()
+        self.show_time = show_time
+        self.hexagons = self.creat_task()                 # call instance method
         self.user_id = None                               # unique id 
-        # self.num_task_played = None
+        
+        # based on user answer
+        self.task_showing_datetime = None                 # time of showing the task to user; used for ordering
+        self.indices_answer = []
+        self.sequence_answer = []                         # string like: TTTTFF
+        self.num_task_played = None
         self.response_time_seq = None
-        self.indices_answer = [None]*len(indices_to_1)
-        self.answer_sequenc = None                        # string like: TTTTFF
         self.num_true = None
         self.num_false = None
         self.is_wined = None                              # boolean, True: all correct ans, Fasle: at least one incorrect
@@ -30,11 +32,10 @@ class Task:
 
         # determine if first cell is yellow or white
         temp = True if 0 in self.indices_to_1 else False
-        leftmost_hexagon = HexagonTile(is_target_cell=temp, position=(200, 200))  # TODO: change the position
-        hexagons = [leftmost_hexagon]
         hex_counter = 0
+        leftmost_hexagon = HexagonTile(is_target_cell=temp, position=(200, 200), index=hex_counter)  # TODO: change the position
+        hexagons = [leftmost_hexagon]
         gap = 0
-        
         # iterate over rows
         for x in range(self.num_y):  # x is the row number
             if x:
@@ -45,7 +46,7 @@ class Task:
 
                 # determine if current cell is target or not (yellow or white)
                 is_target_cell = True if hex_counter in self.indices_to_1 else False
-                leftmost_hexagon = HexagonTile(is_target_cell=is_target_cell, position=position)
+                leftmost_hexagon = HexagonTile(is_target_cell=is_target_cell, position=position, index=hex_counter)
                 hexagons.append(leftmost_hexagon)
                 hex_counter +=1
             else:
@@ -62,11 +63,17 @@ class Task:
                 
                 # determine if current cell is target or not (yellow or white)
                 is_target_cell = True if hex_counter in self.indices_to_1 else False
-                hexagon = HexagonTile(is_target_cell=False, position=position)
+                hexagon = HexagonTile(is_target_cell=is_target_cell, position=position, index=hex_counter)
                 hexagons.append(hexagon)
                 hex_counter +=1
-                
+      
         return hexagons
 
+    # def set_task_showing_datetime(self):
+    #     self.task_showing_datetime = datetime.datetime.now()
+
+    def append_sequence_answer(self, T_or_F):
+        # self.sequence_answer = self.sequence_answer + T_or_F
+        self.sequence_answer.append(T_or_F)
 
     # def answer_task(self):
