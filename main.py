@@ -9,7 +9,7 @@ from typing import Tuple
 import time
 import datetime
 import pygame
-from hexagon import Task
+from task import Task
 from hexagon import HexagonTile
 
 from dataclasses import dataclass
@@ -82,17 +82,17 @@ def init_hexagons(indices_to_1, num_x=6, num_y=4) -> List[HexagonTile]:
 
 
 def main():
-    """Main function"""
+    # creat an instance of task
+    task_obj = Task(indices_to_1=[1, 2, 3, 23], num_x=6, num_y=4)
+
     # show the task to the player for show_time seconds
     pygame.init()
-    indices_to_1 = [1, 2, 3, 23]
-    hexagons = init_hexagons(indices_to_1)
     screen = pygame.display.set_mode((750, 750))
     # screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     show_time = 2
     endTime = datetime.datetime.now() + datetime.timedelta(seconds=show_time)
     while True:
-        render_task(screen, hexagons)
+        render_task(screen, task_obj.hexagons)
         if datetime.datetime.now() >= endTime:
             break
     pygame.display.quit()
@@ -102,8 +102,9 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((750, 750))
     clock = pygame.time.Clock()
-    terminated = False      # if answer is terminated or not
+    terminated = False              # if answer is terminated or not
     clicked_hexagon_id = set()
+    # click_counter
     while not terminated:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -118,13 +119,19 @@ def main():
                 # get position of the mouse clicke (x, y)
                 pos = pygame.mouse.get_pos()
                 # find the hexagon which the user clicked on
-                for hexagon in hexagons:
+                for hexagon in task_obj.hexagons:
+                    
                     if hexagon.collide_with_point(pos):
+                        
                         clicked_sprites = [hexagon]
+                        print(clicked_sprites)
                         break
                 if clicked_sprites:
                     clicked_hexagon_id.add(id(clicked_sprites[0]))
                     if len(clicked_hexagon_id) == len(indices_to_1):
+                        # add answer sequence to the clicked_sprites
+                        for hexagon in clicked_sprites:
+                            hexagon.asn
                         terminated = True
                         
                 
