@@ -1,33 +1,26 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jan 23 14:07:18 2022
-@author: richa
-"""
 from __future__ import annotations
-
 import math
 from dataclasses import dataclass, field
-from tokenize import String
+# from tokenize import String
 from typing import List
 from typing import Tuple
 from xmlrpc.client import Boolean
-import datetime
 import pygame
 
 
 @dataclass
 class HexagonTile:
-    """Each Hexagon is one object from HexagonTile"""
+    """source: https://github.com/rbaltrusch/pygame_examples/tree/master/code/hexagonal_tiles """
     is_target_cell : Boolean
     position: Tuple[float, float]
-    index: int 
-    radius: float = 50
+    index: int
+    radius: float 
     is_clicked_as_answer: Boolean = False
     is_answered_true: Boolean = None
-    answer_colour: Tuple[int, int, int] = (255, 255, 255)       # answer color of white
+    clr_answer: Tuple[int, int, int] = (255, 255, 255)       # answer color of white
     
     def __post_init__(self):
-        self.colour = (255, 255, 255) if self.is_target_cell == False else (255,215,0)
+        self.clr_hex = (255, 255, 255) if self.is_target_cell == False else (255,215,0)
         self.vertices = self.compute_vertices()
 
 
@@ -53,10 +46,10 @@ class HexagonTile:
             self.is_clicked_as_answer = True
             if self.is_target_cell == True:       # if this cell is s target cell
                 self.is_answered_true = True
-                self.answer_colour = (0, 255, 0)     # green colour
+                self.clr_answer = (0, 255, 0)     # green clr
             else: 
                 self.is_answered_true = False
-                self.answer_colour = (255, 0, 0)     # red colour
+                self.clr_answer = (255, 0, 0)     # red clr
             return True
         else:
             return False
@@ -64,15 +57,15 @@ class HexagonTile:
 
     def render(self, screen) -> None:
         """Renders the hexagon on the screen"""
-        pygame.draw.polygon(screen, (self.highlight_colour), self.vertices)
+        pygame.draw.polygon(screen, (self.highlight_clr), self.vertices)
 
     def render_answer(self, screen) -> None:
         """Renders the hexagon on the screen"""
-        pygame.draw.polygon(screen, (self.answer_colour), self.vertices)
+        pygame.draw.polygon(screen, (self.clr_answer), self.vertices)
 
-    def render_highlight(self, screen, border_colour) -> None:
-        """Draws a border around the hexagon with the specified colour"""
-        pygame.draw.aalines(screen, border_colour, closed=True, points=self.vertices)
+    def render_brdr(self, screen, border_clr=(0, 0, 0)) -> None:
+        """Draws a border around the hexagon with the specified clr"""
+        pygame.draw.aalines(screen, border_clr, closed=True, points=self.vertices)
 
     @property
     def centre(self) -> Tuple[float, float]:
@@ -87,6 +80,6 @@ class HexagonTile:
         return self.radius * math.cos(math.radians(30))
 
     @property
-    def highlight_colour(self) -> Tuple[int, ...]:
-        return tuple(x for x in self.colour)
+    def highlight_clr(self) -> Tuple[int, ...]:
+        return tuple(x for x in self.clr_hex)
 

@@ -1,104 +1,58 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jan 23 13:50:07 2022
-@author: richa
-"""
-import random
-from typing import List
-from typing import Tuple
-import time
-import datetime
+"Author: Masoud Rahimi"
+
+
+from turtle import position
 import pygame
-from task import Task
-from hexagon import HexagonTile
-from dataclasses import dataclass
+from welcome_page import Welcome
+from sign_up_page import SignUp
+from guid_page import GuidPage
+from task import Task, task_param_based_on_screen
+from start_actual_task_page import StartActualTask
 
-
-def render_task(screen, hexagons):
-    """Renders hexagons on the screen"""
-    screen.fill((255, 255, 255))           # screen color of white
-    for hexagon in hexagons:
-        hexagon.render(screen)
-        hexagon.render_highlight(screen, border_colour=(0, 0, 0))
-    pygame.display.flip()
-    
-def render_answer(screen, hexagons):
-    """Renders asnwer on the screen"""
-    screen.fill((255, 255, 255))           # screen color of white
-    for hexagon in hexagons:
-        hexagon.render_answer(screen)
-        hexagon.render_highlight(screen, border_colour=(0, 0, 0))   
-    pygame.display.flip()
-
-
-
-def main(indices_to_1):
-    # creat an instance of task
-    task_obj = Task(indices_to_1=indices_to_1)
-    task_obj.creat_task()
-    # task_obj.user_id =                       # UUID of the user
-
-    # show the task to the player for task_obj.show_time seconds
+if __name__ == '__main__':
     pygame.init()
-    screen = pygame.display.set_mode((750, 750))
     # screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-    endTime = datetime.datetime.now() + datetime.timedelta(seconds=task_obj.show_time)
-    task_obj.task_showing_datetime = datetime.datetime.now()
-    while True:
-        render_task(screen, task_obj.hexagons)
-        if datetime.datetime.now() >= endTime:
-            break
-    pygame.display.quit()
+    screen = pygame.display.set_mode((1920, 1080))
+    # screen = pygame.display.set_mode((800, 800))
+    screen_color = (211,211,211)
+    screen.fill(screen_color)
 
+    # welcome page
+    wlcom_obj = Welcome(screen)
+    wlcom_obj.handler()
+    screen.fill(screen_color)
 
-    # show the white screen to the user in order to get his/her answer
-    pygame.init()
-    screen = pygame.display.set_mode((750, 750))
-    clock = pygame.time.Clock()     # clock is starting at the time of showing white screen in order to get the user's answer
+    # sign up page
+    sign_up_pg_obj = SignUp(screen)
+    user_info = sign_up_pg_obj.handeler()
+    print(user_info)
 
-    terminated = False              # if answering is terminated or not
-    clicked_hexagon_id = set()
-    while not terminated:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminated = True
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    terminated = True
-            
-            # handle MOUSEBUTTONUP
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+    # guide page
+    screen.fill('white')
+    guid_obj = GuidPage()
+    guid_obj.provide_guide(screen)
 
+    # guiding task playing
+    position_inti, R_hexagon= task_param_based_on_screen(screen=screen)
+    screen.fill('white')
+    for indices in ((1, 4, 13), (4, 10, 15, 23), (9, 12, 17, 21, 23), (3, 4, 9, 10, 15, 16, 20)):
+        screen.fill('white')
+        task_obj = Task(indices, position_init=position_inti, R_hexagon=R_hexagon)
+        task_obj.run_guiding_task(screen)
+        break
 
-
-                pos = pygame.mouse.get_pos()           # position of the mouse clicke; (x, y)
-                # find the hexagon which the user clicked on
-                for hexagon in task_obj.hexagons:
-                    if hexagon.collide_with_point(pos) and id(hexagon) not in clicked_hexagon_id :
-                        task_obj.indices_answer.append(hexagon.index)
-                        clicked_hexagon_id.add(id(hexagon))
-                        # add this click data into sequenc_answer (s.th. like this: 'TTTF')
-                        if hexagon.is_answered_true == True:
-                            task_obj.append_sequence_answer('T')
-                        elif hexagon.is_answered_true == False:
-                            task_obj.append_sequence_answer('F')
-                        break
-
-                if len(clicked_hexagon_id) == len(indices_to_1):
-                    terminated = True
-
-
-        render_answer(screen, task_obj.hexagons)
-        clock.tick(50)
-
-
-    time.sleep(1)
-    pygame.display.quit()
-    # print(task_obj.sequence_answer)
-
-
-
-if __name__ == "__main__":
-    main([0, 1, 2, 3])
+    # go to actual task
+    screen.fill('white')
+    sater_actual_pg_obj = StartActualTask()
+    sater_actual_pg_obj.handler(screen)
     
+    # actual task playing
+    screen.fill('white')
+    for indices in ((1, 4, 13), (4, 10, 15, 23), (4, 5, 23)):
+    # for indices in ((1, 4, 13), (4, 10, 15, 23), (9, 12, 17, 21, 23), (3, 4, 9, 10, 15, 16, 20)):
+        screen.fill('white')
+        task_obj = Task(indices, position_init=position_inti, R_hexagon=R_hexagon)
+        task_obj.run_task(screen)
+        # break
+    
+    pygame.quit()
