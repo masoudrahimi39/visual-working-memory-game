@@ -47,6 +47,7 @@ if __name__ == '__main__':
     sater_actual_pg_obj.handler(screen)
     
     # actual task playing
+    print('==='*20, '\n\nwarning: you have to change difficulty and user_id. there have been set temporarily\n\n', '==='*20)
     screen.fill('white')
     for indices in ((1, 4, 13), (4, 10, 15, 23), (4, 5, 23)):
     # for indices in ((1, 4, 13), (4, 10, 15, 23), (9, 12, 17, 21, 23), (3, 4, 9, 10, 15, 16, 20)):

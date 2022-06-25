@@ -20,7 +20,6 @@ class Task:
                 second element : delta_time between last click and current click 
         '''
 
-        print('==='*20, '\n\nwarning: you have to change difficulty and user_id. there have been set temporarily\n\n', '==='*20)
         self.indices_target: list(int, ...) = indices_target
         self.n_target: int = len(indices_target)
         self.difficulty: float = difficulty
@@ -60,17 +59,13 @@ class Task:
         # show the white screen to the user in order to get his/her answer
         terminated = False              # if answering is terminated or not
         clicked_hexagon_id = set()
-        cnt = 0
+        # cnt = 0
         while not terminated:
             for event in pygame.event.get():  
-                # for event in psygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         terminated = True              
-                # handle MOUSEBUTTONUP
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                    # time the currect click
-                    t_current_click = time.time()
                     pos = pygame.mouse.get_pos()           # position of the mouse clicke; (x, y)
                     # find the hexagon which the user clicked on
                     for hexagon in self.hexagons:
@@ -148,6 +143,8 @@ class Task:
         # end of answering to current task
         self.end_of_task()
         time.sleep(2)
+        
+        return self.score
 
     def creat_task(self, R_hexagon) -> List[HexagonTile]:
         """Creates a hexaogonal tile map of size num_x * num_y"""
