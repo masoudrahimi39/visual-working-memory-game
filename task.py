@@ -143,7 +143,7 @@ class Task:
         # end of answering to current task
         self.end_of_task()
         time.sleep(2)
-        
+
         return self.score
 
     def creat_task(self, R_hexagon) -> List[HexagonTile]:
@@ -220,8 +220,7 @@ def task_param_based_on_screen(screen, num_x=6, num_y=4):
     d_hexagon = 2 * R_hexagon * math.cos(math.radians(30))
     position_init = (screen_width/2 - (num_x-1.5)/2*d_hexagon, screen_height/2 - (num_y-0.5) * R_hexagon)
     return position_init, R_hexagon
-
-    
+   
 
 
 if __name__ == '__main__':
