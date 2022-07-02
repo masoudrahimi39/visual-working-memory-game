@@ -15,7 +15,7 @@ np.set_printoptions(precision=2)
 
 
 class HoneyMemoryEnvHuman(Env):
-    def __init__(self, task_database_path='dfclty_dtbs.pkl', episode_len=100, R_type='70-90', n_repeat=1):  
+    def __init__(self,  tracker, task_database_path='dfclty_dtbs.pkl', episode_len=100, R_type='70-90', n_repeat=1):  
         self.action_space = Box(low=-1.0, high=1.0, shape=(1,))   # action: difficulty
         self.observation_space = Box(low=np.array([-1.0, 0.0]), high=np.array([1.0, 1.0]))  # state: : (difficulty, score)
         
@@ -24,14 +24,17 @@ class HoneyMemoryEnvHuman(Env):
         self.state =  self.reset()               # starting state 
         self.R_type = R_type                                               # R_type ∈ {'d*s', }
         self.n_repeat = n_repeat
-
+        self.score_list = []
         # TODO: below loading difficlty should be changed. it must be loaded once.
         self.dfclty_dtbs = pd.read_pickle(task_database_path)
         self.screen = self.start_rendering()
         self.position_init, self.R_hexagon = task_param_based_on_screen(self.screen)
+        self.tracker = tracker
 
     def start_rendering(self):
         ''' first initial the pygame, then it provide the welcome, sign up, guid, guiding task playing pages in pygame'''
+        # initial the tracker
+        self.tracker.start_recording()
         pygame.init()
         self.screen = pygame.display.set_mode((1919, 1079))
         self.screen.fill('white')
@@ -65,6 +68,7 @@ class HoneyMemoryEnvHuman(Env):
         # provide task to human player
         chosn_tsks = self.provide_n_reapet_task(source_val=action.item())
         score = self.render(chosn_tsks=chosn_tsks, dfclty=action.item())
+        self.score_list.append(score)
         self.state = np.array([action.item(), score], dtype=np.float32)
 
         # reward based on R_type
@@ -91,7 +95,7 @@ class HoneyMemoryEnvHuman(Env):
     
     def reset(self):
         # TODO: starting state should be changed based on player performance  
-        self.state = np.array([0.2, 0.5], np.float32)              # Reset the state
+        self.state = np.array([0, 0.5], np.float32)              # Reset the state
         self.episode_len = self.episode_len_init                   # Reset the episode len
         return self.state
      
@@ -107,7 +111,7 @@ class HoneyMemoryEnvHuman(Env):
         avg_score = 0
         n = 0
         for indcs in chosn_tsks: 
-            task_obj = Task(indices_target=indcs, difficulty=dfclty, user_id=100, 
+            task_obj = Task(self.tracker, indices_target=indcs, difficulty=dfclty, user_id=100, 
                             position_init=self.position_init, R_hexagon=self.R_hexagon)
             score = task_obj.run_task(self.screen)
             avg_score = (avg_score*n + score) / (n+1)

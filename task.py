@@ -12,13 +12,18 @@ from pprint import pprint
 import math
 from buttons import Title
 
+
 class Task:
-    def __init__(self, indices_target, difficulty=10, user_id=10, num_x=6, num_y=4, show_time=2, position_init=(763, 300), R_hexagon=70):
+    def __init__(self, tracker, indices_target, tracker_obj, task_nmbr, sbjct_nmbr, dda_mthd, difficulty=10, user_id=10, num_x=6, num_y=4, show_time=2, position_init=(763, 300), R_hexagon=70):
         '''
             sequence_response_time: list[float, float, ...]: each float is in second. 
                 first element : delta_time between start answering and ffirst click
                 second element : delta_time between last click and current click 
         '''
+        self.task_nmbr = task_nmbr
+        self.sbjct_nmr = sbjct_nmbr
+        self.dda_mthd = dda_mthd
+        self.tracker = tracker 
 
         self.indices_target: list(int, ...) = indices_target
         self.n_target: int = len(indices_target)
@@ -46,7 +51,7 @@ class Task:
         title_bnt = Title(screen, clr_txt=(0,59,102), clr_brdr='white', show_up_txt='guiding trials')
         endTime = datetime.datetime.now() + datetime.timedelta(seconds=self.show_time)
         terminated = False
-        while not terminated:
+        while not terminated: 
             title_bnt.draw()
             self.render_task(screen)
             for event in pygame.event.get():  
@@ -55,12 +60,12 @@ class Task:
                             terminated = True
             if datetime.datetime.now() >= endTime:
                 break
-
+        
         # show the white screen to the user in order to get his/her answer
         terminated = False              # if answering is terminated or not
         clicked_hexagon_id = set()
         # cnt = 0
-        while not terminated:
+        while not terminated:       
             for event in pygame.event.get():  
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -83,13 +88,15 @@ class Task:
         endTime = datetime.datetime.now() + datetime.timedelta(seconds=self.show_time)
         self.start_showing_task_ts = time.time()
         terminated = False
-        while not terminated:
+        while not terminated:    # memorization mode 
+            event_tag_ET = str(self.task_nmbr) + '_MEMO'
+            self.tracker.user_data(event_tag_ET)        # send event to eye tracker
             self.render_task(screen)
             # TODO: delete below lines
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        terminated = True
+            # for event in pygame.event.get():
+            #     if event.type == pygame.KEYDOWN:
+            #         if event.key == pygame.K_ESCAPE:
+            #             terminated = True
             if datetime.datetime.now() >= endTime:
                 break
 
@@ -97,13 +104,18 @@ class Task:
         terminated = False              # if answering is terminated or not
         clicked_hexagon_id = set()
         cnt = 0
-        while not terminated:
+        cnt_warning = 0
+        while not terminated:    # recal mode
+            # send event to eye tracker
+            event_tag_ET = str(self.task_nmbr) + '_RECALL'
+            self.tracker.user_data(event_tag_ET)   
+
             # TODO: del 3 below lines 
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        terminated = True
-                
+            #     if event.type == pygame.KEYDOWN:
+            #         if event.key == pygame.K_ESCAPE:
+            #             terminated = True
+
                 # handle MOUSEBUTTONUP
                 if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                     # time the currect click
@@ -140,6 +152,7 @@ class Task:
             if cnt == 0:     # at the moment that answering screen is shown
                 cnt += 1
                 self.start_answering_ts = time.time()
+                warning_time = self.start_answering_ts + 3
         # end of answering to current task
         self.end_of_task()
         time.sleep(2)
@@ -207,7 +220,7 @@ class Task:
         self.score = self.num_true / self.n_target
 
 
-def task_param_based_on_screen(screen, num_x=6, num_y=4):
+def task_param_based_on_screen(screen, num_x=6, num_y=6):
     ''' input
         -------
             screen: pygame screen object
@@ -229,10 +242,12 @@ if __name__ == '__main__':
     # get parameters to pass into the Task based on screen size
     position_init, R_hexagon = task_param_based_on_screen(screen)
     screen.fill('white') 
-    for i in [(2, 7, 13, 20), (1, 2, 3, 4)]:
-        task_obj = Task(indices_target=i, position_init=position_init, R_hexagon=R_hexagon)
-        # task_obj.run_task(screen)
-        task_obj.run_guiding_task(screen)
-        # pprint(vars(task_obj))
+    # (0, 2, 3, 5, 12, 17, 20, 22, 30, 33, 35)
+    for i in [(0, 5, 8, 9, 11, 17, 20, 22, 30, 33, 35), (1, 2, 3, 4)]:
+        task_obj = Task(indices_target=i, num_x=6, num_y=6, position_init=position_init, R_hexagon=R_hexagon)
+        # task_obj.show_time = 70
+        task_obj.run_task(screen)
+        # task_obj.run_guiding_task(screen)
+        pprint(vars(task_obj))
         # break
     pygame.display.quit()
