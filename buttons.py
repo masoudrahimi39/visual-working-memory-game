@@ -10,7 +10,7 @@ class NextButton:
         FONT = pygame.font.Font(None, screen_width//24)
         text_width, text_height = FONT.size(show_up_txt) 
         w = text_width*1.14
-        x = 4*screen_width/5 - w/2
+        x = 5*screen_width/6 - w/2
         y = 3*screen_height/4
         self.rect = pygame.Rect(x, y, w, h)
         self.clr_brdr = clr_brdr
@@ -31,16 +31,17 @@ class NextButton:
         pygame.draw.rect(self.screen, self.clr_brdr, self.rect, 2)
 
 class Title:
-    def __init__(self, screen, clr_txt=(0,59,102), clr_brdr=(211,211,211), h=90, show_up_txt=""):
+    def __init__(self, screen, font_ratio_to_screen=20 ,clr_txt=(0,59,102), clr_brdr=(211,211,211), h=90, show_up_txt=""):
         self.screen = screen 
         screen_width, screen_height = screen.get_size()
-        self.FONT = pygame.font.Font(None, screen_width//20)
+        self.FONT = pygame.font.Font(None, screen_width//font_ratio_to_screen)
         text_width, text_height = self.FONT.size(show_up_txt) 
         w = text_width*1.08
         x = screen_width/2 - w/2
         y = screen_height/30
         
         self.rect = pygame.Rect(x, y, w, h)
+        
         self.txt_surface = self.FONT.render(show_up_txt, True, clr_txt)
         self.clr_brdr = clr_brdr
         # self.clr_brdr = 'black'
@@ -48,6 +49,7 @@ class Title:
     def draw(self):
         self.screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         pygame.draw.rect(self.screen, self.clr_brdr, self.rect, 2)
+        # pygame.display.flip()
  
 class TitleOfInputBox:
     def __init__(self, screen, title_text, x, y, w=280, clr_brdr_inactive=(192,192,192), clr_txt=(0,59,102)):
@@ -113,12 +115,5 @@ class InputBox:
         pygame.draw.rect(screen, self.clr_brdr, self.rect, 2)
 
 
-# if __name__ == '__main__':
-#     pygame.init()
-#     screen = pygame.display.set_mode((1919, 1079))  
-#     # screen = pygame.display.set_mode((1000, 1000)) 
-#     # screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-#     screen.fill('white') 
-#     next_bn_obj = NextButton(screen)
-#     while True :
-#         next_bn_obj.draw()
+
+

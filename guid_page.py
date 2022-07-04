@@ -1,6 +1,7 @@
 import pygame
 from buttons import NextButton
-
+import sys 
+sys.path.append('/media/expansion/Master/DDA-Thesis/Implementation/001-/visual-spatial-memory-game')
 
 class GuidPage:
     # def __init__(self) -> None:

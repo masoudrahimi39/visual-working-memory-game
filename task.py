@@ -2,7 +2,6 @@ from __future__ import annotations
 from sqlite3 import Timestamp
 from typing import List
 from typing import Tuple
-from wsgiref.headers import Headers
 from xmlrpc.client import Boolean
 from hexagon import HexagonTile
 import time
@@ -14,122 +13,95 @@ from buttons import Title
 
 
 class Task:
-    def __init__(self, tracker, indices_target, tracker_obj, task_nmbr, sbjct_nmbr, dda_mthd, difficulty=10, user_id=10, num_x=6, num_y=4, show_time=2, position_init=(763, 300), R_hexagon=70):
+    def __init__(self, *, indices_target, dda_mthd, user_info, difficulty, num_x, 
+                num_y, show_time, position_init, R_hexagon, tracker, is_eye_tracker):
         '''
+            is_eye_tracker: Boolean: If True, there is a eye tracker device else there isn't.
+            tracker: Eye tracker object; it is used if is_eye_tracker == True, else it is ignored.
+            indices_target: tuple: used to create the task. It contains indices of the cells which should be target cells. 
+                    indexing start from up left to right and then down
+            dda_mthd: str: it determines which method used for DDA
+            user_info: dict: it is the user data. all elements of user_info are added to the __dict__ attribute of the obj
+            difficutly: the correspondance difficutly of the task.
+            num_x: number of columns in the task table
+            num_y: number of the rows in the task table
+            show_time: int: the task is shown to the user to memorize it for show_time seconds.
+            position_inti: the position of the most-upper-left hexagon in the task; it is passed to the HexagonTile
+            R_hexagon: float: the Radiu of the hexagon; it is passed to the HexagonTile
             sequence_response_time: list[float, float, ...]: each float is in second. 
-                first element : delta_time between start answering and ffirst click
+                first element : delta_time between start answering and first click
                 second element : delta_time between last click and current click 
         '''
-        self.task_nmbr = task_nmbr
-        self.sbjct_nmr = sbjct_nmbr
-        self.dda_mthd = dda_mthd
+        # update the __dict__ of the this object with the user_info
+        self.__dict__.update(user_info)
+        self.is_eye_tracker = is_eye_tracker
         self.tracker = tracker 
-
         self.indices_target: list(int, ...) = indices_target
-        self.n_target: int = len(indices_target)
+        self.dda_mthd = dda_mthd
         self.difficulty: float = difficulty
         self.num_x: int = num_x
         self.num_y: int = num_y
         self.show_time: int = show_time
         self.position_init: Tuple(int, int) = position_init
+        self.R_hexagon = R_hexagon
+        self.n_target: int = len(indices_target)
         self.hexagons:List(HexagonTile, HexagonTile, ...) = self.creat_task(R_hexagon)        # call instance method
-        self.user_id = user_id                            # unique id 
         
         # based on user answer
         self.start_showing_task_ts: Timestamp = None                 # time of showing the task to user; used for ordering
+        self.end_showing_task_ts: Timestamp = None
         self.start_answering_ts: Timestamp = None                    # time of showing the white cells to user to get his answer
         self.indices_answer: List(int, ...) = []
         self.sequence_answer: List(int, ...) = []                         
         self.sequence_response_time: List(Timestamp, ...) = []                 
         self.num_true: int = None                              
         self.num_false: int = None
-        self.is_wined: Boolean = None                              # boolean, True: all correct ans, Fasle: at least one incorrect
+        self.is_wined: Boolean = None                                # boolean, True: all correct ans, Fasle: at least one incorrect
         self.score: float = None
         self.end_answering_ts: Timestamp = None
 
-    def run_guiding_task(self, screen):
-        title_bnt = Title(screen, clr_txt=(0,59,102), clr_brdr='white', show_up_txt='guiding trials')
-        endTime = datetime.datetime.now() + datetime.timedelta(seconds=self.show_time)
-        terminated = False
-        while not terminated: 
-            title_bnt.draw()
-            self.render_task(screen)
-            for event in pygame.event.get():  
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_ESCAPE:
-                            terminated = True
-            if datetime.datetime.now() >= endTime:
-                break
-        
-        # show the white screen to the user in order to get his/her answer
-        terminated = False              # if answering is terminated or not
-        clicked_hexagon_id = set()
-        # cnt = 0
-        while not terminated:       
-            for event in pygame.event.get():  
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        terminated = True              
-                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                    pos = pygame.mouse.get_pos()           # position of the mouse clicke; (x, y)
-                    # find the hexagon which the user clicked on
-                    for hexagon in self.hexagons:
-                        if hexagon.collide_with_point(pos) and id(hexagon) not in clicked_hexagon_id :
-                            clicked_hexagon_id.add(id(hexagon))
-                            break
-                
-                    if len(clicked_hexagon_id) == len(self.indices_target):
-                        terminated = True
-            title_bnt.draw()
-            self.render_answer(screen)
-        time.sleep(2)
 
     def run_task(self, screen):
+        ''' '''
         endTime = datetime.datetime.now() + datetime.timedelta(seconds=self.show_time)
         self.start_showing_task_ts = time.time()
         terminated = False
         while not terminated:    # memorization mode 
-            event_tag_ET = str(self.task_nmbr) + '_MEMO'
-            self.tracker.user_data(event_tag_ET)        # send event to eye tracker
+            # TODO: is usage of tracker true here
+            if self.is_eye_tracker == True:
+                event_tag_ET = str(self.task_nmbr) + '_MEMO'
+                self.tracker.user_data(event_tag_ET)        # send event to eye tracker
             self.render_task(screen)
-            # TODO: delete below lines
-            # for event in pygame.event.get():
-            #     if event.type == pygame.KEYDOWN:
-            #         if event.key == pygame.K_ESCAPE:
-            #             terminated = True
             if datetime.datetime.now() >= endTime:
+                self.end_showing_task_ts = time.time()
                 break
 
         # show the white screen to the user in order to get his/her answer
         terminated = False              # if answering is terminated or not
         clicked_hexagon_id = set()
         cnt = 0
-        cnt_warning = 0
+        pygame.event.clear()
         while not terminated:    # recal mode
-            # send event to eye tracker
-            event_tag_ET = str(self.task_nmbr) + '_RECALL'
-            self.tracker.user_data(event_tag_ET)   
+            # TODO: is usage of tracker true here
+            if self.is_eye_tracker == True:
+                # send event to eye tracker
+                event_tag_ET = str(self.task_nmbr) + '_RECALL'
+                self.tracker.user_data(event_tag_ET) 
 
-            # TODO: del 3 below lines 
             for event in pygame.event.get():
-            #     if event.type == pygame.KEYDOWN:
-            #         if event.key == pygame.K_ESCAPE:
-            #             terminated = True
-
-                # handle MOUSEBUTTONUP
-                if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                    # time the currect click
-                    t_current_click = time.time()
+                if (event.type == pygame.MOUSEBUTTONUP) and (event.button == 1):
+                    t_current_click = time.time()          # the currect click time 
                     pos = pygame.mouse.get_pos()           # position of the mouse clicke; (x, y)
+                    
                     # find the hexagon which the user clicked on
                     for hexagon in self.hexagons:
                         if hexagon.collide_with_point(pos) and id(hexagon) not in clicked_hexagon_id :
 
                             # append response time to sequence_response_time
-                            if len(clicked_hexagon_id) == 0:           # if it is first click of user
+                            if len(clicked_hexagon_id) == 0:           # if it is the first click of the user
                                 self.sequence_response_time.append(t_current_click - self.start_answering_ts)
                                 t_last_click = t_current_click
-                            else:
+                            else:                                     # if it is not the first click of the user
                                 self.sequence_response_time.append(t_current_click - t_last_click)
                                 t_last_click = t_current_click
 
@@ -137,22 +109,33 @@ class Task:
                             self.indices_answer.append(hexagon.index)
                             clicked_hexagon_id.add(id(hexagon))
 
-                            # append this click data into sequenc_answer (s.th. like this: 'TTTF')
+                            # append this click data into sequenc_answer
                             if hexagon.is_answered_true == True:
                                 self.sequence_answer.append(1)
                             elif hexagon.is_answered_true == False:
                                 self.sequence_answer.append(0)
                             break
-                
+                    
                     if len(clicked_hexagon_id) == len(self.indices_target):
                         terminated = True
 
-            self.render_answer(screen)
-            
+            self.render_answer(screen)  
             if cnt == 0:     # at the moment that answering screen is shown
                 cnt += 1
                 self.start_answering_ts = time.time()
-                warning_time = self.start_answering_ts + 3
+                start_warning_time = self.start_answering_ts + 5
+                end_warning_time = start_warning_time + 2
+            if time.time() > end_warning_time:
+                try:
+                    del warning_obj
+                    screen.fill('white')
+                except:
+                    pass
+    
+            elif time.time() > start_warning_time:
+                warning_obj = Title(screen, font_ratio_to_screen=25, clr_brdr='white', show_up_txt=f'{self.n_target-len(self.indices_answer)} more click')
+                warning_obj.draw()
+                
         # end of answering to current task
         self.end_of_task()
         time.sleep(2)
@@ -160,12 +143,12 @@ class Task:
         return self.score
 
     def creat_task(self, R_hexagon) -> List[HexagonTile]:
-        """Creates a hexaogonal tile map of size num_x * num_y"""
+        """Creates a hexaogonal tile map of size num_x * num_y correspondance to the indices_target and return a list of hexagons"""
 
         # determine if first cell is yellow or white
         temp = True if 0 in self.indices_target else False
         hex_counter = 0
-        leftmost_hexagon = HexagonTile(is_target_cell=temp, position=self.position_init, index=hex_counter, radius=R_hexagon)  # TODO: change the position
+        leftmost_hexagon = HexagonTile(is_target_cell=temp, position=self.position_init, index=hex_counter, radius=R_hexagon)
         hexagons = [leftmost_hexagon]
         # iterate over rows
         for x in range(self.num_y):  # x is the row number
@@ -213,11 +196,15 @@ class Task:
         pygame.display.flip()
         
     def end_of_task(self):
+        ''' set some attributes value. delete some useless attributes'''
         self.end_answering_ts = time.time()
         self.num_true = self.sequence_answer.count(1)
         self.num_false = self.sequence_answer.count(0)
         self.is_wined = 1 if self.num_true == self.n_target else 0
         self.score = self.num_true / self.n_target
+        delattr(self, 'hexagons')
+        # TODO: maybe i should delete the tracker attribute
+        # delattr(self, 'tracker')
 
 
 def task_param_based_on_screen(screen, num_x=6, num_y=6):
@@ -242,12 +229,11 @@ if __name__ == '__main__':
     # get parameters to pass into the Task based on screen size
     position_init, R_hexagon = task_param_based_on_screen(screen)
     screen.fill('white') 
-    # (0, 2, 3, 5, 12, 17, 20, 22, 30, 33, 35)
-    for i in [(0, 5, 8, 9, 11, 17, 20, 22, 30, 33, 35), (1, 2, 3, 4)]:
-        task_obj = Task(indices_target=i, num_x=6, num_y=6, position_init=position_init, R_hexagon=R_hexagon)
-        # task_obj.show_time = 70
+    for i in [(1, 2, 3, 4, 33), (1, 3, 5, 9), (18, 17, 31), (0, 5, 8, 9, 11, 17, 20, 22, 30, 33, 35)]:
+        task_obj = Task(indices_target=i, dda_mthd='nothing', user_info={}, difficulty=None, num_x=6, 
+                        num_y=6, show_time=2, position_init=position_init, R_hexagon=R_hexagon,
+                         tracker=None, is_eye_tracker=False)
         task_obj.run_task(screen)
-        # task_obj.run_guiding_task(screen)
-        pprint(vars(task_obj))
+        # pprint(vars(task_obj))
         # break
     pygame.display.quit()
