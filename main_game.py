@@ -106,7 +106,7 @@ def game_provider_rule_based(*, episode_len):
 
     ### running Rule-based 
     screen.fill('white') 
-    score_list = dda_rule_based(screen=screen, episode_len=episode_len, user_info=user_info, do_sv_gm_ply_dt=False,
+    score_list = dda_rule_based(screen=screen, episode_len=episode_len, user_info=user_info, do_sv_gm_ply_dt=True,
                 gm_ply_dt_file_nm='test_rule_base', num_x=6, num_y=6, is_eye_tracker=False, tracker=None)
     
     pygame.display.quit()
@@ -118,7 +118,7 @@ def game_provider_rule_based(*, episode_len):
 
 
 if __name__ == '__main__':
-    score_list = game_provider_rule_based(episode_len=10)
+    score_list = game_provider_rule_based(episode_len=10    )
     plt.plot(score_list)
     plt.title('your score graph')
     plt.xlabel('step')

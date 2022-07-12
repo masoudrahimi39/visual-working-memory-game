@@ -123,18 +123,18 @@ class Task:
             if cnt == 0:     # at the moment that answering screen is shown
                 cnt += 1
                 self.start_answering_ts = time.time()
-                start_warning_time = self.start_answering_ts + 5
-                end_warning_time = start_warning_time + 2
-            if time.time() > end_warning_time:
-                try:
-                    del warning_obj
-                    screen.fill('white')
-                except:
-                    pass
-    
-            elif time.time() > start_warning_time:
-                warning_obj = Title(screen, font_ratio_to_screen=25, clr_brdr='white', show_up_txt=f'{self.n_target-len(self.indices_answer)} more click')
-                warning_obj.draw()
+            #    start_warning_time = self.start_answering_ts + 5
+            #     end_warning_time = start_warning_time + 2
+            # if time.time() > end_warning_time:
+            #     try:
+            #         del warning_obj
+            #         screen.fill('white')
+            #     except:
+            #         pass
+            # 
+            # elif time.time() > start_warning_time:
+            #     warning_obj = Title(screen, font_ratio_to_screen=25, clr_brdr='white', show_up_txt=f'{self.n_target-len(self.indices_answer)} more click')
+            #     warning_obj.draw()
                 
         # end of answering to current task
         self.end_of_task()

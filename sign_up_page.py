@@ -1,4 +1,3 @@
-# from platform import python_branch
 import pygame
 from buttons import NextButton, Title, TitleOfInputBox, InputBox
 
