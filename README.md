@@ -10,7 +10,8 @@ just run `main_game.py`
 # visual-spatial-working memory task in pygame
 ### This repo output in below video
 
-user should memorize yellow cells and then recall them. Finally, it save the game play data in a csv file
+- user should memorize yellow cells and then recall them. 
+- Finally, it save the game play data in a csv file.
 
 
 
