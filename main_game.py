@@ -41,14 +41,14 @@ def dda_rule_based(*, screen, episode_len, user_info, do_sv_gm_ply_dt, gm_ply_dt
     game_play_data_list = []
     position_init, R_hexagon = task_param_based_on_screen(screen)
     n_target = 5
-    for t in range(episode_len):
+    for step in range(episode_len):
         n_target = np.clip(n_target, a_min = 4, a_max = 14) 
         
         can_be_target_cell = set(range(36)) - {0, 5, 8, 9, 11, 17, 20, 22, 30, 33, 35}
         indces_one = random.sample(can_be_target_cell, k=n_target)
         task_obj = Task(indices_target=indces_one, dda_mthd='rule-base', user_info=user_info, difficulty=None, 
                         num_x=num_x, num_y=num_y, show_time=2, position_init=position_init, R_hexagon=R_hexagon,
-                        is_eye_tracker=is_eye_tracker, tracker=tracker)
+                        is_eye_tracker=is_eye_tracker, tracker=tracker, task_nmbr=step)
         score = task_obj.run_task(screen)
         game_play_data_list.append(vars(task_obj))
         print('(n_target, score): ', n_target,', ',  score)
@@ -90,12 +90,12 @@ def game_provider_rule_based(*, episode_len):
 
     ### guiding task playing
     position_inti, R_hexagon= task_param_based_on_screen(screen=screen)
-    for indices in ((1, 4, 13), (4, 10, 15, 23), (9, 12, 17, 21, 23), (3, 4, 9, 10, 15, 16, 20)):
+    for indices in ((1, 4, 13), (9, 12, 17, 21, 23), (3, 4, 9, 10, 15, 16, 20)):
         screen.fill('white')
         task_obj = TaskGuiding(indices_target=indices, position_init=position_inti, R_hexagon=R_hexagon,
                                show_time=2, num_x=6, num_y=6)
         task_obj.run_guiding_task(screen)
-        # break
+        break
 
 
     ### go to actual task
@@ -106,7 +106,7 @@ def game_provider_rule_based(*, episode_len):
 
     ### running Rule-based 
     screen.fill('white') 
-    score_list = dda_rule_based(screen=screen, episode_len=episode_len, user_info=user_info, do_sv_gm_ply_dt=True,
+    score_list = dda_rule_based(screen=screen, episode_len=episode_len, user_info=user_info, do_sv_gm_ply_dt=False,
                 gm_ply_dt_file_nm='test_rule_base', num_x=6, num_y=6, is_eye_tracker=False, tracker=None)
     
     pygame.display.quit()
@@ -118,7 +118,7 @@ def game_provider_rule_based(*, episode_len):
 
 
 if __name__ == '__main__':
-    score_list = game_provider_rule_based(episode_len=10    )
+    score_list = game_provider_rule_based(episode_len=2)
     plt.plot(score_list)
     plt.title('your score graph')
     plt.xlabel('step')

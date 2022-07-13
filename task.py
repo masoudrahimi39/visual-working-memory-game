@@ -14,10 +14,12 @@ from buttons import Title
 
 class Task:
     def __init__(self, *, indices_target, dda_mthd, user_info, difficulty, num_x, 
-                num_y, show_time, position_init, R_hexagon, tracker, is_eye_tracker):
+                num_y, show_time, position_init, R_hexagon, tracker, is_eye_tracker, task_nmbr):
         '''
             is_eye_tracker: Boolean: If True, there is a eye tracker device else there isn't.
             tracker: Eye tracker object; it is used if is_eye_tracker == True, else it is ignored.
+            tsk_nmbr: int: if is_eye_tracker True, it is used. it shows the the sequence of showing task to user in a trial.
+                0 means it is the first task in the trial, 1 means the 2nd task in the rial.
             indices_target: tuple: used to create the task. It contains indices of the cells which should be target cells. 
                     indexing start from up left to right and then down
             dda_mthd: str: it determines which method used for DDA
@@ -59,35 +61,39 @@ class Task:
         self.is_wined: Boolean = None                                # boolean, True: all correct ans, Fasle: at least one incorrect
         self.score: float = None
         self.end_answering_ts: Timestamp = None
-
+        # TODO: add task_nmbr
+        self.task_nmbr = task_nmbr
 
     def run_task(self, screen):
         ''' '''
         endTime = datetime.datetime.now() + datetime.timedelta(seconds=self.show_time)
         self.start_showing_task_ts = time.time()
         terminated = False
-        while not terminated:    # memorization mode 
-            # TODO: is usage of tracker true here
-            if self.is_eye_tracker == True:
-                event_tag_ET = str(self.task_nmbr) + '_MEMO'
-                self.tracker.user_data(event_tag_ET)        # send event to eye tracker
+
+        # send trigger to eye tracker; start memorization
+        if self.is_eye_tracker == True:
+            event_tag_ET = str(self.task_nmbr) + '_MEMO_ST'
+            self.tracker.user_data(event_tag_ET)        # send event to eye tracker
+        
+        # memorization mode
+        while not terminated:     
             self.render_task(screen)
             if datetime.datetime.now() >= endTime:
                 self.end_showing_task_ts = time.time()
                 break
-
+        
+        # send trigger to eye tracker; end memorization
+        if self.is_eye_tracker == True:
+            event_tag_ET = str(self.task_nmbr) + '_MEMO_END'
+            self.tracker.user_data(event_tag_ET)        # send event to eye tracker
+                
+        # recal mode
         # show the white screen to the user in order to get his/her answer
         terminated = False              # if answering is terminated or not
         clicked_hexagon_id = set()
         cnt = 0
         pygame.event.clear()
-        while not terminated:    # recal mode
-            # TODO: is usage of tracker true here
-            if self.is_eye_tracker == True:
-                # send event to eye tracker
-                event_tag_ET = str(self.task_nmbr) + '_RECALL'
-                self.tracker.user_data(event_tag_ET) 
-
+        while not terminated:    
             for event in pygame.event.get():
                 if (event.type == pygame.MOUSEBUTTONUP) and (event.button == 1):
                     t_current_click = time.time()          # the currect click time 
@@ -121,6 +127,11 @@ class Task:
 
             self.render_answer(screen)  
             if cnt == 0:     # at the moment that answering screen is shown
+                # send trigger to eye tracker; start recall
+                if self.is_eye_tracker == True:
+                    # send event to eye tracker
+                    event_tag_ET = str(self.task_nmbr) + '_RECALL_ST'
+                    self.tracker.user_data(event_tag_ET)
                 cnt += 1
                 self.start_answering_ts = time.time()
             #    start_warning_time = self.start_answering_ts + 5
@@ -135,7 +146,13 @@ class Task:
             # elif time.time() > start_warning_time:
             #     warning_obj = Title(screen, font_ratio_to_screen=25, clr_brdr='white', show_up_txt=f'{self.n_target-len(self.indices_answer)} more click')
             #     warning_obj.draw()
-                
+        
+        # send trigger to eye tracker; end recall
+        if self.is_eye_tracker == True:
+            # send event to eye tracker
+            event_tag_ET = str(self.task_nmbr) + '_RECALL_END'
+            self.tracker.user_data(event_tag_ET)
+
         # end of answering to current task
         self.end_of_task()
         time.sleep(2)
@@ -204,7 +221,7 @@ class Task:
         self.score = self.num_true / self.n_target
         delattr(self, 'hexagons')
         # TODO: maybe i should delete the tracker attribute
-        # delattr(self, 'tracker')
+        delattr(self, 'tracker')
 
 
 def task_param_based_on_screen(screen, num_x=6, num_y=6):
@@ -232,7 +249,7 @@ if __name__ == '__main__':
     for i in [(1, 2, 3, 4, 33), (1, 3, 5, 9), (18, 17, 31), (0, 5, 8, 9, 11, 17, 20, 22, 30, 33, 35)]:
         task_obj = Task(indices_target=i, dda_mthd='nothing', user_info={}, difficulty=None, num_x=6, 
                         num_y=6, show_time=2, position_init=position_init, R_hexagon=R_hexagon,
-                         tracker=None, is_eye_tracker=False)
+                         tracker=None, is_eye_tracker=False, task_nmbr=None)
         task_obj.run_task(screen)
         # pprint(vars(task_obj))
         # break
