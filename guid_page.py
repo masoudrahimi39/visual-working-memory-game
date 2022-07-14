@@ -8,7 +8,7 @@ class GuidPage:
         # self.screen = screen 
 
     def provide_guide(self, screen):
-        img1 = pygame.image.load('guide_fa.png')
+        img1 = pygame.image.load('guide_en.png')
         next_obj = NextButton(screen, clr_brdr=(255, 255, 255))
         terminated = False
         while not terminated:
