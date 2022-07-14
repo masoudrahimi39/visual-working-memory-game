@@ -8,10 +8,14 @@ just run `main_game.py`
 
 ------   
 # visual-spatial-working memory task in pygame
-### This repo output in below video
+### Below is a video showing this repository output
 
-- user should memorize yellow cells and then recall them. 
-- Finally, it save the game play data in a csv file.
+- It contains several pages such as <ins>welcome</ins>   ,<ins>sign up</ins>, <ins>guiding</ins>, <ins>guiding task</ins>, <ins>go to actual task</ins>, <ins>actual task</ins>. 
+- The user signs up first, then receives guidance about how to do the memory task, then performs it.
+- how to do memory task?
+    - The user must memorize yellow cells within two seconds, then all cells turn white and the user must recall and select them.
+- At the end, the user game play data is saved in .csv and .plk file.
+- Lots of parameters can be adjusted.
 
 
 
@@ -21,6 +25,4 @@ https://user-images.githubusercontent.com/65596290/178737195-80565633-60ce-4d58-
 
 
 
-- It contains several pages such as <ins>welcome</ins>   ,<ins>sign up</ins>, <ins>guiding</ins>, <ins>guiding task</ins>, <ins>go to actual task</ins>, <ins>actual task</ins>. 
-- At the end, the user game play data is saved in .csv and .plk file.
-- this function parameters can be set arbitrarily
+
