@@ -1,4 +1,4 @@
-# visual-spatial-working-memory-game
+# visual working memory game
 
 ## how to run
 just run `main_game.py`
@@ -7,7 +7,7 @@ just run `main_game.py`
     pygame='2.1.2'
 
 ------   
-# visual-spatial-working memory task in pygame
+# visual working memory task in pygame
 ### Below is a video showing this repository output
 
 - It contains several pages such as <ins>welcome</ins>   ,<ins>sign up</ins>, <ins>guiding</ins>, <ins>guiding task</ins>, <ins>go to actual task</ins>, <ins>actual task</ins>. 
