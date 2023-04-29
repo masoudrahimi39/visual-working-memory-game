@@ -1,4 +1,4 @@
-# visual working memory game
+# visual working memory game in pygame
 
 ## how to run
 just run `main_game.py`
@@ -7,8 +7,8 @@ just run `main_game.py`
     pygame='2.1.2'
 
 ------   
-# visual working memory task in pygame
-### Below is a video showing this repository output
+## About visual working memory task
+### The following video displays the output of this repository.
 
 - It contains several pages such as <ins>welcome</ins>   ,<ins>sign up</ins>, <ins>guiding</ins>, <ins>guiding task</ins>, <ins>go to actual task</ins>, <ins>actual task</ins>. 
 - The user signs up first, then receives guidance about how to do the memory task, then performs it.
