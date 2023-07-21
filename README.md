@@ -17,9 +17,9 @@ This project serves multiple purposes:
 
 ## Features
 - **Adjustable Parameters**: All Python functions and classes have clear and concise docstrings, making it easy to modify and extend the game's functionalities.
-- **Structured User Journey**: The game follows a well-structured user journey, guiding players through different pages, including "Welcome," "Sign Up," "Guiding," "Guiding Task," "Go to Actual Task," and "Actual Task." This ensures a smooth and engaging user experience.
+- **Structured User Journey**: The game follows a well-structured user journey, guiding players through different pages, including "Welcome," "Sign Up," "Guiding," "Guiding Task," "Go to Actual Task," and "Actual Task."
 - **Rule-Based Difficulty Adjustment**: The game incorporates a rule-based difficulty adjustment system, ensuring that players are appropriately challenged as they progress through the tasks.
-- Data Storage: The player's gameplay data is saved in both CSV and plk (Pandas DataFrames) files, facilitating data analysis and post-game insights.
+- **Data Storage**: The player's gameplay data is saved in CSV and plk (Pandas DataFrames) files, facilitating data analysis and post-game insights.
 
 ## About the memory game?
 - At the beginning, a 6*6 hexagonal grid is displayed for two seconds, with certain hexagons simultaneously highlighted in yellow (known as "targets") while the rest are white. 
