@@ -1,7 +1,6 @@
 # Visual working memory game
 
-## Demo
-
+### Demo
 https://user-images.githubusercontent.com/65596290/178737195-80565633-60ce-4d58-8590-a0c315346da4.mp4
 
 ## Installation
