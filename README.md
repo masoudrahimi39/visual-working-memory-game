@@ -4,9 +4,15 @@
 https://user-images.githubusercontent.com/65596290/178737195-80565633-60ce-4d58-8590-a0c315346da4.mp4
 
 ## Installation
-1. Clone the repository by running ```git clone https://github.com/masoudrahimi39/visual-working-memory-game.git```
-2. Install dependencies: `python='3.8', pygame='2.1.2', Pandas, NumPy, Matplotlib`
-   ```pip install pygame='2.1.2', Pandas, NumPy, Matplotlib```
+1. Clone the repository by running
+```php
+git clone https://github.com/masoudrahimi39/visual-working-memory-game.git
+   ```
+
+2. Install dependencies: `python='3.8', pygame='2.1.2', Pandas, NumPy, Matplotlib` by running below:
+   ```php
+   pip install pygame='2.1.2', Pandas, NumPy, Matplotlib
+   ```
 4. Run `main_game.py`
 
 ## Usage
