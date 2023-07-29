@@ -32,3 +32,7 @@ This project serves multiple purposes:
 - Correct and incorrect clicks instantly become green and red, respectively. 
 - The player's score is the number of correct clicks divided by the total number of targets in the task.
 - A score 1 represents a win, whereas other scores represent a loss.
+
+
+---
+If you find these search shortcuts helpful, consider giving this repository a ⭐ to show your support and help others discover it.
