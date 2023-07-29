@@ -35,4 +35,4 @@ This project serves multiple purposes:
 
 
 ---
-If you find these search shortcuts helpful, consider giving this repository a ⭐ to show your support and help others discover it.
+If you find these repository helpful, consider giving it a ⭐ to show your support and help others discover it.
