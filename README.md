@@ -15,6 +15,8 @@ git clone https://github.com/masoudrahimi39/visual-working-memory-game.git
    ```
 4. Run `main_game.py`
 
+If you find these search shortcuts helpful, consider giving this repository a ⭐ to show your support and help others discover it.
+
 ## Usage
 This project serves multiple purposes:
 1. **Entertainment**: Play the game for fun and test your visual working memory abilities.
