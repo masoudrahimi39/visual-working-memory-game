@@ -3,6 +3,9 @@
 ### Demo
 https://user-images.githubusercontent.com/65596290/178737195-80565633-60ce-4d58-8590-a0c315346da4.mp4
 
+--
+If you find this repo helpful, consider giving it a ⭐ to show your support and help others discover it.
+--
 ## Installation
 1. Clone the repository by running
 ```php
@@ -15,7 +18,6 @@ git clone https://github.com/masoudrahimi39/visual-working-memory-game.git
    ```
 4. Run `main_game.py`
 
-If you find these search shortcuts helpful, consider giving this repository a ⭐ to show your support and help others discover it.
 
 ## Usage
 This project serves multiple purposes:
@@ -35,6 +37,3 @@ This project serves multiple purposes:
 - The player's score is the number of correct clicks divided by the total number of targets in the task.
 - A score 1 represents a win, whereas other scores represent a loss.
 
-
----
-If you find these repository helpful, consider giving it a ⭐ to show your support and help others discover it.
