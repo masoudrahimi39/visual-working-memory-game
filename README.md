@@ -3,9 +3,9 @@
 ### Demo
 https://user-images.githubusercontent.com/65596290/178737195-80565633-60ce-4d58-8590-a0c315346da4.mp4
 
---
+---
 If you find this repo helpful, consider giving it a ⭐ to show your support and help others discover it.
---
+
 ## Installation
 1. Clone the repository by running
 ```php
