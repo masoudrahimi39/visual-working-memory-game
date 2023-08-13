@@ -1,5 +1,5 @@
 # Visual working memory game
---
+
 If you find this repo helpful, consider giving it a ⭐ to show your support and help others discover it.
 
 ### Demo
