@@ -26,7 +26,7 @@ This project serves multiple purposes:
 
 ## Features
 - **Adjustable Parameters**: All Python functions and classes have clear and concise docstrings, making it easy to modify and extend the game's functionalities.
-- - **Rule-Based Difficulty Adjustment**: The game incorporates a rule-based difficulty adjustment system, ensuring that players are appropriately challenged as they progress through the tasks.
+   - - **Rule-Based Difficulty Adjustment**: The game incorporates a rule-based difficulty adjustment system, ensuring that players are appropriately challenged as they progress through the tasks.
 - **Data Storage**: The player's gameplay data is saved in CSV and plk (Pandas DataFrames) files, facilitating data analysis and post-game insights.
 - **Structured User Journey**: The task follows a well-structured user journey, guiding players through different pages, including "Welcome," "Sign Up," "Guiding," "Guiding trials," and "Actual Trials."
 
